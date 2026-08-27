@@ -1,5 +1,10 @@
 package com.mushind.mind.feature.settings
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,17 +15,31 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mushind.mind.R
 import com.mushind.mind.core.design.component.ScreenHeader
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
+    val reminderSettings by viewModel.reminderSettings.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        viewModel.setPlanningReminderEnabled(granted)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -34,9 +53,23 @@ fun SettingsScreen() {
             )
         }
         SettingsSection(stringResource(R.string.routine)) {
-            SettingsRow(
+            SettingsSwitchRow(
                 title = stringResource(R.string.planning_reminder),
                 value = stringResource(R.string.planning_reminder_default),
+                checked = reminderSettings.enabled,
+                onCheckedChange = { enabled ->
+                    val needsPermission =
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                            ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.POST_NOTIFICATIONS,
+                            ) != PackageManager.PERMISSION_GRANTED
+                    if (enabled && needsPermission) {
+                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        viewModel.setPlanningReminderEnabled(enabled)
+                    }
+                },
             )
         }
         SettingsSection(stringResource(R.string.appearance)) {
@@ -46,6 +79,33 @@ fun SettingsScreen() {
             )
         }
     }
+}
+
+@Composable
+private fun SettingsSwitchRow(
+    title: String,
+    value: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onCheckedChange(!checked) }
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = title)
+            Text(
+                text = value,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+    HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
 }
 
 @Composable

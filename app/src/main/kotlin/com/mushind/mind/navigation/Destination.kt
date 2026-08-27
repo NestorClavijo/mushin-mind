@@ -11,7 +11,7 @@ import com.mushind.mind.R
 
 enum class TopLevelDestination(
     val route: String,
-    @StringRes val label: Int,
+    @param:StringRes val label: Int,
     val icon: ImageVector,
 ) {
     HOME("home", R.string.nav_home, Icons.Outlined.Home),
@@ -19,4 +19,3 @@ enum class TopLevelDestination(
     STATISTICS("statistics", R.string.nav_statistics, Icons.Outlined.BarChart),
     SETTINGS("settings", R.string.nav_settings, Icons.Outlined.Settings),
 }
-

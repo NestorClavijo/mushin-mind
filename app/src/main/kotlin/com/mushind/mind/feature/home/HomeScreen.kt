@@ -13,18 +13,27 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mushind.mind.R
 import com.mushind.mind.core.design.component.EmptyState
+import com.mushind.mind.domain.model.DailyPlan
+import com.mushind.mind.domain.model.DailyPlanStatus
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,25 +47,92 @@ fun HomeScreen() {
         Spacer(Modifier.height(20.dp))
         BalanceCard(balance = 0)
         Spacer(Modifier.height(28.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(stringResource(R.string.today_plan), style = MaterialTheme.typography.titleLarge)
-            Text("0 / 0", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        EmptyState(
-            title = stringResource(R.string.no_tasks_today),
-            explanation = stringResource(R.string.no_tasks_explanation),
-        )
-        Button(
-            onClick = { },
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(stringResource(R.string.plan_tomorrow))
+        when (val state = uiState) {
+            HomeUiState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
+            HomeUiState.Error -> EmptyState(
+                title = stringResource(R.string.daily_cycle_error),
+                explanation = stringResource(R.string.daily_cycle_error),
+                actionLabel = stringResource(R.string.retry),
+                onAction = viewModel::reconcile,
+            )
+            is HomeUiState.Content -> DailyPlanContent(
+                state = state,
+                onPrepareTomorrow = viewModel::prepareTomorrow,
+                onConfirmTomorrow = viewModel::confirmTomorrow,
+            )
         }
     }
+}
+
+@Composable
+private fun DailyPlanContent(
+    state: HomeUiState.Content,
+    onPrepareTomorrow: () -> Unit,
+    onConfirmTomorrow: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(stringResource(R.string.today_plan), style = MaterialTheme.typography.titleLarge)
+        state.todayPlan?.let { PlanStatusLabel(it.status) }
+    }
+    EmptyState(
+        title = stringResource(R.string.no_tasks_today),
+        explanation = stringResource(R.string.no_tasks_explanation),
+    )
+
+    val tomorrowPlan = state.tomorrowPlan
+    if (tomorrowPlan == null) {
+        Button(onClick = onPrepareTomorrow, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.plan_tomorrow))
+        }
+    } else {
+        TomorrowPlanCard(tomorrowPlan, onConfirmTomorrow)
+    }
+}
+
+@Composable
+private fun TomorrowPlanCard(plan: DailyPlan, onConfirm: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(stringResource(R.string.tomorrow_plan), style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = plan.date.toString(),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            PlanStatusLabel(plan.status)
+            if (plan.status == DailyPlanStatus.DRAFT) {
+                OutlinedButton(onClick = onConfirm, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.confirm_plan))
+                }
+            } else if (plan.status == DailyPlanStatus.CONFIRMED) {
+                Text(stringResource(R.string.plan_ready), color = MaterialTheme.colorScheme.primary)
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlanStatusLabel(status: DailyPlanStatus) {
+    val label = when (status) {
+        DailyPlanStatus.DRAFT -> R.string.plan_draft
+        DailyPlanStatus.CONFIRMED -> R.string.plan_confirmed
+        DailyPlanStatus.ACTIVE -> R.string.plan_active
+        DailyPlanStatus.CLOSED -> R.string.plan_closed
+    }
+    Text(
+        text = stringResource(label),
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
 
 @Composable
@@ -80,4 +156,3 @@ private fun BalanceCard(balance: Int) {
         }
     }
 }
-
