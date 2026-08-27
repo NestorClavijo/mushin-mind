@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import com.mushind.mind.data.local.entity.UnlockSessionStatus
 import com.mushind.mind.data.local.entity.UnlockSessionType
 import com.mushind.mind.domain.model.DailyPlanStatus
+import com.mushind.mind.domain.model.AppRuleType
 import com.mushind.mind.domain.model.PointTransactionType
 import com.mushind.mind.domain.model.TaskOrigin
 import com.mushind.mind.domain.model.TaskStatus
@@ -27,4 +28,6 @@ class RoomConverters {
     @TypeConverter fun stringToSessionType(value: String): UnlockSessionType = UnlockSessionType.valueOf(value)
     @TypeConverter fun sessionStatusToString(value: UnlockSessionStatus): String = value.name
     @TypeConverter fun stringToSessionStatus(value: String): UnlockSessionStatus = UnlockSessionStatus.valueOf(value)
+    @TypeConverter fun appRuleTypeToString(value: AppRuleType): String = value.name
+    @TypeConverter fun stringToAppRuleType(value: String): AppRuleType = AppRuleType.valueOf(value)
 }

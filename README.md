@@ -16,6 +16,10 @@ Desarrollo inicial:
 - preparación y confirmación del plan de mañana;
 - activación, cierre y reconciliación idempotente de días lógicos;
 - recordatorio nocturno opcional con DataStore y WorkManager.
+- catálogo de aplicaciones instaladas con búsqueda, iconos y exclusión de Mind;
+- reglas persistentes de sesión temporal, acceso hasta fin del día y tiempo acumulable;
+- clasificación de cambios estrictos y permisivos con protección para futuras relajaciones;
+- advertencias antes de restringir aplicaciones sensibles o críticas.
 
 La especificación funcional se encuentra en [REQUIREMENTS.md](REQUIREMENTS.md) y el orden de implementación en [PLAN.md](PLAN.md).
 
