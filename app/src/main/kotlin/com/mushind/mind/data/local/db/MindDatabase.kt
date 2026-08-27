@@ -30,7 +30,7 @@ import com.mushind.mind.data.local.entity.AppRuleEntity
         RestrictedAppEntity::class,
         AppRuleEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 @TypeConverters(RoomConverters::class)

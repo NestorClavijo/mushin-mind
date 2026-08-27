@@ -20,6 +20,9 @@ Desarrollo inicial:
 - reglas persistentes de sesión temporal, acceso hasta fin del día y tiempo acumulable;
 - clasificación de cambios estrictos y permisivos con protección para futuras relajaciones;
 - advertencias antes de restringir aplicaciones sensibles o críticas.
+- motor transaccional de compra de acceso con protección frente a gasto concurrente;
+- sesiones temporales, hasta fin del día y extensiones acumulables persistentes;
+- evaluación de acceso, expiración por timestamp y finalización anticipada sin reembolso.
 
 La especificación funcional se encuentra en [REQUIREMENTS.md](REQUIREMENTS.md) y el orden de implementación en [PLAN.md](PLAN.md).
 
