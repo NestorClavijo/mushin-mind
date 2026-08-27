@@ -23,6 +23,9 @@ Desarrollo inicial:
 - motor transaccional de compra de acceso con protección frente a gasto concurrente;
 - sesiones temporales, hasta fin del día y extensiones acumulables persistentes;
 - evaluación de acceso, expiración por timestamp y finalización anticipada sin reembolso.
+- protección mediante AccessibilityService orientada solo a cambios de ventana;
+- shield de bloqueo con saldo, confirmación de compra y salida segura al Home;
+- detección visible del estado del servicio desde Configuración.
 
 La especificación funcional se encuentra en [REQUIREMENTS.md](REQUIREMENTS.md) y el orden de implementación en [PLAN.md](PLAN.md).
 

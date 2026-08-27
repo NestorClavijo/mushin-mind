@@ -56,6 +56,9 @@ interface UnlockSessionDao {
     @Query("UPDATE user_progress SET balance = balance - :cost WHERE id = 1 AND balance >= :cost")
     suspend fun debitIfEnough(cost: Int): Int
 
+    @Query("UPDATE user_progress SET balance = balance + :points WHERE id = 1")
+    suspend fun addPoints(points: Int): Int
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertTransaction(transaction: PointTransactionEntity)
 
