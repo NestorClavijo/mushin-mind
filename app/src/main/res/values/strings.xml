@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Mind</string>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_apps">Apps</string>
+    <string name="nav_statistics">Estadísticas</string>
+    <string name="nav_settings">Configuración</string>
+    <string name="home_greeting">Buenos días</string>
+    <string name="available_balance">puntos disponibles</string>
+    <string name="today_balance_activity">+0 hoy · 0 gastados</string>
+    <string name="today_plan">Plan de hoy</string>
+    <string name="no_tasks_today">No tienes tareas para hoy</string>
+    <string name="no_tasks_explanation">Prepara mañana con antelación para que tus tareas puedan generar puntos.</string>
+    <string name="plan_tomorrow">Planificar mañana</string>
+    <string name="apps_title">Aplicaciones</string>
+    <string name="apps_empty">Todavía no controlas ninguna aplicación</string>
+    <string name="apps_empty_explanation">Aquí podrás elegir las apps en las que quieres introducir una pausa antes de entrar.</string>
+    <string name="choose_apps">Elegir aplicaciones</string>
+    <string name="statistics_title">Estadísticas</string>
+    <string name="statistics_empty">Tu actividad aparecerá aquí</string>
+    <string name="statistics_empty_explanation">Completa tareas y utiliza puntos para empezar a construir tu historial.</string>
+    <string name="settings_title">Configuración</string>
+    <string name="protection">Protección</string>
+    <string name="protection_disabled">Desactivada</string>
+    <string name="routine">Rutina</string>
+    <string name="planning_reminder">Recordatorio de planificación</string>
+    <string name="planning_reminder_default">9:30 p. m.</string>
+    <string name="appearance">Apariencia</string>
+    <string name="theme">Tema</string>
+    <string name="system_theme">Sistema</string>
+    <string name="development_foundation">Base del proyecto lista</string>
+</resources>
