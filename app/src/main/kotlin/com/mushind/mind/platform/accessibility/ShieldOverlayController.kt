@@ -1,6 +1,7 @@
 package com.mushind.mind.platform.accessibility
 
 import android.accessibilityservice.AccessibilityService
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Typeface
@@ -15,12 +16,20 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Space
 import android.widget.TextView
+import android.widget.EditText
+import android.view.MotionEvent
+import android.os.SystemClock
 import androidx.core.graphics.ColorUtils
 import com.mushind.mind.domain.model.AppRule
+import com.mushind.mind.domain.model.RestrictedApp
+import com.mushind.mind.domain.usecase.HoldConfirmationGate
 
 class ShieldOverlayController(
     private val service: AccessibilityService,
     private val onPurchase: (AppRule) -> Unit,
+    private val onEmergencyRequested: (RestrictedApp) -> Unit,
+    private val onEmergencyConfirmed: (RestrictedApp, String?) -> Unit,
+    private val onEmergencyCancelled: (String) -> Unit,
     private val onExit: () -> Unit,
 ) {
     private val windowManager = service.getSystemService(WindowManager::class.java)
@@ -95,6 +104,8 @@ class ShieldOverlayController(
                 content.addText("No pudimos iniciar el acceso", 24f, true, top = 24)
                 content.addText(state.message, 16f, false, top = 12)
             }
+            is ShieldState.EmergencyWarning -> addEmergencyWarning(content, state)
+            is ShieldState.EmergencyConfirmation -> addEmergencyConfirmation(content, state)
         }
 
         content.addView(Space(service), LinearLayout.LayoutParams(1, 0, 1f))
@@ -120,6 +131,84 @@ class ShieldOverlayController(
                 fullWidthParams(top = 24),
             )
         }
+        content.addView(
+            button("Usar desbloqueo de emergencia", primary = false) {
+                onEmergencyRequested(state.app)
+            },
+            fullWidthParams(top = 12),
+        )
+    }
+
+    private fun addEmergencyWarning(content: LinearLayout, state: ShieldState.EmergencyWarning) {
+        content.addText("Desbloqueo de emergencia", 26f, true, top = 24)
+        content.addText(
+            "Esta acción omitirá temporalmente la regla y quedará registrada.",
+            16f,
+            false,
+            top = 14,
+        )
+        content.addText("Duración: ${state.preview.policy.durationMinutes} min", 17f, false, top = 18)
+        content.addText(
+            "Penalización: ${state.preview.appliedPenaltyPoints} pts",
+            17f,
+            false,
+            top = 8,
+        )
+        content.addView(
+            button("Continuar", primary = true) {
+                show(ShieldState.EmergencyConfirmation(state.app, state.preview))
+            },
+            fullWidthParams(top = 22),
+        )
+        content.addView(
+            button("Cancelar", primary = false) { onEmergencyCancelled(state.app.packageName) },
+            fullWidthParams(top = 10),
+        )
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun addEmergencyConfirmation(content: LinearLayout, state: ShieldState.EmergencyConfirmation) {
+        content.addText("Mantén pulsado para desbloquear", 24f, true, top = 24)
+        val reason = EditText(service).apply {
+            hint = "Motivo opcional"
+            setTextColor(Color.WHITE)
+            setHintTextColor(Color.rgb(160, 165, 160))
+            maxLines = 3
+        }
+        content.addView(reason, fullWidthParams(top = 18))
+        val gate = HoldConfirmationGate()
+        val holdLabel = service.getString(com.mushind.mind.R.string.emergency_hold_button)
+        val hold = button(holdLabel, primary = true) { }
+        hold.setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    gate.start(SystemClock.elapsedRealtime())
+                    (view as Button).text = service.getString(com.mushind.mind.R.string.emergency_hold_progress)
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    val confirmed = gate.release(SystemClock.elapsedRealtime())
+                    (view as Button).text = holdLabel
+                    if (confirmed) {
+                        view.performClick()
+                        view.isEnabled = false
+                        onEmergencyConfirmed(state.app, reason.text?.toString())
+                    }
+                    true
+                }
+                MotionEvent.ACTION_CANCEL -> {
+                    gate.cancel()
+                    (view as Button).text = holdLabel
+                    true
+                }
+                else -> true
+            }
+        }
+        content.addView(hold, fullWidthParams(top = 18))
+        content.addView(
+            button("Cancelar", primary = false) { onEmergencyCancelled(state.app.packageName) },
+            fullWidthParams(top = 10),
+        )
     }
 
     private fun addConfirmation(content: LinearLayout, state: ShieldState.Confirming) {

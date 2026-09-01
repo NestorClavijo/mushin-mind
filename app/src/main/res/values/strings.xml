@@ -38,4 +38,6 @@
     <string name="appearance">Apariencia</string>
     <string name="theme">Tema</string>
     <string name="system_theme">Sistema</string>
+    <string name="emergency_hold_button">Mantener pulsado 3 segundos</string>
+    <string name="emergency_hold_progress">Sigue pulsando…</string>
 </resources>

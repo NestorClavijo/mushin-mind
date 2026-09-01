@@ -40,6 +40,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
     val reminderSettings by viewModel.reminderSettings.collectAsStateWithLifecycle()
     val isProtectionEnabled by viewModel.isProtectionEnabled.collectAsStateWithLifecycle()
     val debugBalance by viewModel.debugBalance.collectAsStateWithLifecycle()
+    val emergencyPolicy by viewModel.emergencyPolicy.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -91,6 +92,18 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
             SettingsRow(
                 title = stringResource(R.string.theme),
                 value = stringResource(R.string.system_theme),
+            )
+        }
+        SettingsSection("Emergencia") {
+            SettingsRow(
+                title = "Duración del acceso",
+                value = "${emergencyPolicy.durationMinutes} min",
+                onClick = viewModel::cycleEmergencyDuration,
+            )
+            SettingsRow(
+                title = "Penalización",
+                value = if (emergencyPolicy.fixedPenaltyPoints == 0) "Sin penalización" else "${emergencyPolicy.fixedPenaltyPoints} pts",
+                onClick = viewModel::cycleEmergencyPenalty,
             )
         }
         if (BuildConfig.DEBUG) {

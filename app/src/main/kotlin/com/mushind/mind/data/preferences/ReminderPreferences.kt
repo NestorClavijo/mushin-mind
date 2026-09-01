@@ -10,6 +10,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import com.mushind.mind.domain.model.EmergencyPenaltyMode
+import com.mushind.mind.domain.model.EmergencyPolicy
+import com.mushind.mind.domain.repository.EmergencyPolicyRepository
 
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
 
@@ -47,5 +50,39 @@ class ReminderPreferences @Inject constructor(
         val ENABLED = booleanPreferencesKey("planning_reminder_enabled")
         val HOUR = intPreferencesKey("planning_reminder_hour")
         val MINUTE = intPreferencesKey("planning_reminder_minute")
+    }
+}
+
+@Singleton
+class EmergencyPreferences @Inject constructor(
+    @param:ApplicationContext private val context: Context,
+) : EmergencyPolicyRepository {
+    override val policy: Flow<EmergencyPolicy> = context.settingsDataStore.data.map { preferences ->
+        EmergencyPolicy(
+            durationMinutes = preferences[DURATION] ?: 10,
+            penaltyMode = EmergencyPenaltyMode.valueOf(
+                preferences[PENALTY_MODE] ?: EmergencyPenaltyMode.FIXED_POINTS.name,
+            ),
+            fixedPenaltyPoints = preferences[PENALTY_POINTS] ?: 20,
+        )
+    }
+
+    override suspend fun setDurationMinutes(minutes: Int) {
+        require(minutes in 1..60)
+        context.settingsDataStore.edit { it[DURATION] = minutes }
+    }
+
+    override suspend fun setFixedPenalty(points: Int) {
+        require(points in 0..500)
+        context.settingsDataStore.edit {
+            it[PENALTY_MODE] = if (points == 0) EmergencyPenaltyMode.NONE.name else EmergencyPenaltyMode.FIXED_POINTS.name
+            it[PENALTY_POINTS] = points
+        }
+    }
+
+    private companion object {
+        val DURATION = intPreferencesKey("emergency_duration_minutes")
+        val PENALTY_MODE = androidx.datastore.preferences.core.stringPreferencesKey("emergency_penalty_mode")
+        val PENALTY_POINTS = intPreferencesKey("emergency_penalty_points")
     }
 }

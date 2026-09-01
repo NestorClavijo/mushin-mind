@@ -117,9 +117,9 @@ private fun UnlockSessionEntity.toDomain() = UnlockSession(
     type = when (type) {
         UnlockSessionType.TEMPORARY -> UnlockSessionKind.TEMPORARY
         UnlockSessionType.UNTIL_END_OF_DAY -> UnlockSessionKind.UNTIL_END_OF_DAY
-        UnlockSessionType.EMERGENCY -> UnlockSessionKind.TEMPORARY
+        UnlockSessionType.EMERGENCY -> UnlockSessionKind.EMERGENCY
     },
-    appliedRuleType = ruleType,
+    appliedRuleType = if (type == UnlockSessionType.EMERGENCY) null else ruleType,
     startsAt = startsAt,
     endsAt = endsAt,
     logicalDay = logicalDay,

@@ -12,6 +12,8 @@ import com.mushind.mind.domain.repository.AppRulesRepository
 import com.mushind.mind.domain.repository.SessionPurchaseResult
 import com.mushind.mind.domain.usecase.CanUnlockApp
 import com.mushind.mind.domain.usecase.PurchaseUnlock
+import com.mushind.mind.domain.usecase.PrepareEmergencyUnlock
+import com.mushind.mind.domain.usecase.CreateEmergencyUnlock
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -28,6 +30,8 @@ class AppRestrictionAccessibilityService : AccessibilityService() {
     @Inject lateinit var appRulesRepository: AppRulesRepository
     @Inject lateinit var canUnlockApp: CanUnlockApp
     @Inject lateinit var purchaseUnlock: PurchaseUnlock
+    @Inject lateinit var prepareEmergencyUnlock: PrepareEmergencyUnlock
+    @Inject lateinit var createEmergencyUnlock: CreateEmergencyUnlock
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var foregroundPolicy: ForegroundAppPolicy
@@ -47,6 +51,9 @@ class AppRestrictionAccessibilityService : AccessibilityService() {
         overlayController = ShieldOverlayController(
             service = this,
             onPurchase = ::purchase,
+            onEmergencyRequested = ::requestEmergency,
+            onEmergencyConfirmed = ::confirmEmergency,
+            onEmergencyCancelled = ::cancelEmergency,
             onExit = ::exitToHome,
         )
     }
@@ -144,6 +151,46 @@ class AppRestrictionAccessibilityService : AccessibilityService() {
                 )
             }
         }
+    }
+
+    private fun requestEmergency(app: RestrictedApp) {
+        evaluationJob?.cancel()
+        evaluationJob = serviceScope.launch {
+            val preview = try {
+                prepareEmergencyUnlock()
+            } catch (error: Exception) {
+                if (error is CancellationException) throw error
+                overlayController.show(ShieldState.Error(app, "No se pudo preparar la emergencia."))
+                return@launch
+            }
+            overlayController.show(ShieldState.EmergencyWarning(app, preview))
+        }
+    }
+
+    private fun confirmEmergency(app: RestrictedApp, reason: String?) {
+        evaluationJob?.cancel()
+        evaluationJob = serviceScope.launch {
+            overlayController.show(ShieldState.Starting(app))
+            val result = try {
+                createEmergencyUnlock(app.packageName, reason)
+            } catch (error: Exception) {
+                if (error is CancellationException) throw error
+                null
+            }
+            if (result != null) {
+                delay(250)
+                hideShield()
+            } else {
+                overlayController.show(
+                    ShieldState.Error(app, "La emergencia no pudo registrarse. No se aplicó ninguna penalización."),
+                )
+            }
+        }
+    }
+
+    private fun cancelEmergency(packageName: String) {
+        evaluationJob?.cancel()
+        evaluationJob = serviceScope.launch { evaluate(packageName) }
     }
 
     private fun exitToHome() {

@@ -4,6 +4,7 @@ import com.mushind.mind.domain.model.AccessDecision
 import com.mushind.mind.domain.model.AppRule
 import com.mushind.mind.domain.model.AppRuleType
 import com.mushind.mind.domain.model.RestrictedApp
+import com.mushind.mind.domain.model.EmergencyPreview
 
 sealed interface ShieldState {
     val app: RestrictedApp
@@ -26,6 +27,14 @@ sealed interface ShieldState {
 
     data class Starting(override val app: RestrictedApp) : ShieldState
     data class Error(override val app: RestrictedApp, val message: String) : ShieldState
+    data class EmergencyWarning(
+        override val app: RestrictedApp,
+        val preview: EmergencyPreview,
+    ) : ShieldState
+    data class EmergencyConfirmation(
+        override val app: RestrictedApp,
+        val preview: EmergencyPreview,
+    ) : ShieldState
 }
 
 fun shieldStateFor(app: RestrictedApp, decision: AccessDecision): ShieldState? = when (decision) {
@@ -53,4 +62,3 @@ fun AppRule.accessDescription(): String = when (type) {
     AppRuleType.UNTIL_END_OF_DAY -> "Hasta terminar el día"
     AppRuleType.PURCHASABLE_TIME -> "$durationMinutes minutos acumulables"
 }
-

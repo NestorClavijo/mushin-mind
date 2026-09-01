@@ -9,6 +9,7 @@ import com.mushind.mind.data.local.dao.TaskDao
 import com.mushind.mind.data.local.dao.UnlockSessionDao
 import com.mushind.mind.data.local.dao.AppRulesDao
 import com.mushind.mind.data.local.dao.ProtectedRuleChangeDao
+import com.mushind.mind.data.local.dao.EmergencyUnlockDao
 import com.mushind.mind.data.local.entity.DailyCycleStateEntity
 import com.mushind.mind.data.local.entity.DailyPlanEntity
 import com.mushind.mind.data.local.entity.DailySummaryEntity
@@ -20,6 +21,7 @@ import com.mushind.mind.data.local.entity.RestrictedAppEntity
 import com.mushind.mind.data.local.entity.AppRuleEntity
 import com.mushind.mind.data.local.entity.ChallengeAttemptEntity
 import com.mushind.mind.data.local.entity.PendingRuleChangeEntity
+import com.mushind.mind.data.local.entity.EmergencyUnlockEntity
 
 @Database(
     entities = [
@@ -34,8 +36,9 @@ import com.mushind.mind.data.local.entity.PendingRuleChangeEntity
         AppRuleEntity::class,
         ChallengeAttemptEntity::class,
         PendingRuleChangeEntity::class,
+        EmergencyUnlockEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 @TypeConverters(RoomConverters::class)
@@ -46,4 +49,5 @@ abstract class MindDatabase : RoomDatabase() {
     abstract fun unlockSessionDao(): UnlockSessionDao
     abstract fun appRulesDao(): AppRulesDao
     abstract fun protectedRuleChangeDao(): ProtectedRuleChangeDao
+    abstract fun emergencyUnlockDao(): EmergencyUnlockDao
 }

@@ -70,3 +70,20 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_pending_rule_changes_challengeAttemptId` ON `pending_rule_changes` (`challengeAttemptId`)")
     }
 }
+
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """CREATE TABLE IF NOT EXISTS `emergency_unlocks` (
+                `id` TEXT NOT NULL, `sessionId` TEXT NOT NULL, `packageName` TEXT NOT NULL,
+                `reason` TEXT, `durationMinutes` INTEGER NOT NULL,
+                `configuredPenaltyPoints` INTEGER NOT NULL, `appliedPenaltyPoints` INTEGER NOT NULL,
+                `balanceBefore` INTEGER NOT NULL, `balanceAfter` INTEGER NOT NULL,
+                `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`)
+            )""".trimIndent(),
+        )
+        db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_emergency_unlocks_sessionId` ON `emergency_unlocks` (`sessionId`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_emergency_unlocks_packageName` ON `emergency_unlocks` (`packageName`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_emergency_unlocks_createdAt` ON `emergency_unlocks` (`createdAt`)")
+    }
+}

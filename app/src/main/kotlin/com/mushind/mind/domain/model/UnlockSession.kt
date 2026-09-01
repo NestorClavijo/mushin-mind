@@ -8,7 +8,7 @@ data class UnlockSession(
     val id: String,
     val packageName: String,
     val type: UnlockSessionKind,
-    val appliedRuleType: AppRuleType,
+    val appliedRuleType: AppRuleType?,
     val startsAt: Instant,
     val endsAt: Instant,
     val logicalDay: LocalDate,
@@ -19,7 +19,9 @@ data class UnlockSession(
         require(id.isNotBlank()) { "Session id cannot be blank" }
         require(packageName.isNotBlank()) { "Package name cannot be blank" }
         require(endsAt > startsAt) { "Session must end after it starts" }
-        require(costPoints > 0) { "Session cost must be positive" }
+        require(if (type == UnlockSessionKind.EMERGENCY) costPoints >= 0 else costPoints > 0) {
+            "Session cost is invalid"
+        }
     }
 
     fun isActiveAt(instant: Instant): Boolean =
@@ -32,6 +34,7 @@ data class UnlockSession(
 enum class UnlockSessionKind {
     TEMPORARY,
     UNTIL_END_OF_DAY,
+    EMERGENCY,
 }
 
 enum class UnlockSessionState {
