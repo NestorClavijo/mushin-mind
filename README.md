@@ -26,6 +26,9 @@ Desarrollo inicial:
 - protección mediante AccessibilityService orientada solo a cambios de ventana;
 - shield de bloqueo con saldo, confirmación de compra y salida segura al Home;
 - detección visible del estado del servicio desde Configuración.
+- retos locales de aritmética y secuencias para proteger cambios permisivos;
+- cambios de regla pendientes, reemplazables y cancelables con aplicación al día siguiente;
+- aplicación idempotente de cambios pendientes durante la reconciliación diaria.
 
 La especificación funcional se encuentra en [REQUIREMENTS.md](REQUIREMENTS.md) y el orden de implementación en [PLAN.md](PLAN.md).
 

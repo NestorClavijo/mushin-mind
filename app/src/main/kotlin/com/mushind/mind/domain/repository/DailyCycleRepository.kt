@@ -13,5 +13,5 @@ data class DailyReconciliation(
     val closedPlans: Int,
     val expiredDailySessions: Int,
     val activatedPlan: Boolean,
+    val appliedRuleChanges: Int = 0,
 )
-

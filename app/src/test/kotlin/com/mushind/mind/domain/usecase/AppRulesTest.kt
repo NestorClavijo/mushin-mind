@@ -118,6 +118,23 @@ class AppRulesTest {
         assertNull(repository.saved)
     }
 
+    @Test
+    fun `cost increase is persisted immediately`() = runBlocking {
+        val originalRule = rule(cost = 30, duration = 20)
+        val existing = RestrictedApp(
+            originalRule.packageName, "Música", true, false, originalRule, now, now,
+        )
+        val repository = FakeRulesRepository(existing)
+
+        val result = UpdateAppRule(repository, compare, FixedAppClock(now))(
+            existing,
+            rule(cost = 50, duration = 20),
+        )
+
+        assertSame(RuleChangeResult.Saved, result)
+        assertEquals(50, repository.saved?.rule?.costPoints)
+    }
+
     private fun rule(
         type: AppRuleType = AppRuleType.TEMPORARY_SESSION,
         cost: Int = 20,

@@ -40,6 +40,7 @@ class RoomDailyCycleRepository @Inject constructor(
         }
 
         val expiredSessions = dao.expireDailySessionsBefore(day)
+        val appliedRuleChanges = applyDueRuleChanges(database, day, transitionAt)
         val activated = dao.activateConfirmedPlan(day) == 1
         dao.setCycleState(DailyCycleStateEntity(lastReconciledDay = day))
 
@@ -47,6 +48,7 @@ class RoomDailyCycleRepository @Inject constructor(
             day = day,
             closedPlans = closedPlans,
             expiredDailySessions = expiredSessions,
+            appliedRuleChanges = appliedRuleChanges,
             activatedPlan = activated,
         )
     }
