@@ -32,6 +32,8 @@ Desarrollo inicial:
 - desbloqueo de emergencia secundario con advertencia y confirmación mediante pulsación prolongada;
 - sesiones de emergencia temporales con motivo opcional, penalización limitada al saldo y auditoría persistente;
 - configuración local de duración y penalización de emergencia.
+- resumen diario y semanal calculado desde tareas, transacciones, sesiones y emergencias;
+- desglose semanal por aplicación e historiales recientes de actividad.
 
 La especificación funcional se encuentra en [REQUIREMENTS.md](REQUIREMENTS.md) y el orden de implementación en [PLAN.md](PLAN.md).
 

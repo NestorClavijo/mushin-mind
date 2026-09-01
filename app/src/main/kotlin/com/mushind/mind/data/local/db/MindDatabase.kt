@@ -10,6 +10,7 @@ import com.mushind.mind.data.local.dao.UnlockSessionDao
 import com.mushind.mind.data.local.dao.AppRulesDao
 import com.mushind.mind.data.local.dao.ProtectedRuleChangeDao
 import com.mushind.mind.data.local.dao.EmergencyUnlockDao
+import com.mushind.mind.data.local.dao.StatisticsDao
 import com.mushind.mind.data.local.entity.DailyCycleStateEntity
 import com.mushind.mind.data.local.entity.DailyPlanEntity
 import com.mushind.mind.data.local.entity.DailySummaryEntity
@@ -50,4 +51,5 @@ abstract class MindDatabase : RoomDatabase() {
     abstract fun appRulesDao(): AppRulesDao
     abstract fun protectedRuleChangeDao(): ProtectedRuleChangeDao
     abstract fun emergencyUnlockDao(): EmergencyUnlockDao
+    abstract fun statisticsDao(): StatisticsDao
 }
