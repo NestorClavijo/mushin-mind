@@ -58,7 +58,7 @@ class ShieldOverlayController(
         overlay = null
     }
 
-    private fun buildView(state: ShieldState): View {
+    internal fun buildView(state: ShieldState): View {
         val root = FrameLayout(service).apply {
             setBackgroundColor(Color.rgb(18, 20, 17))
             isFocusableInTouchMode = true

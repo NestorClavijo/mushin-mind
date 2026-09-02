@@ -10,6 +10,7 @@ import com.mushind.mind.data.local.entity.UnlockSessionStatus
 import com.mushind.mind.data.local.entity.UnlockSessionType
 import com.mushind.mind.data.local.entity.UserProgressEntity
 import java.time.Instant
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UnlockSessionDao {
@@ -47,6 +48,12 @@ interface UnlockSessionDao {
     @Query("SELECT balance FROM user_progress WHERE id = 1")
     suspend fun getBalance(): Int?
 
+    @Query("SELECT * FROM user_progress WHERE id = 1")
+    suspend fun getProgress(): UserProgressEntity?
+
+    @Query("SELECT * FROM user_progress WHERE id = 1")
+    fun observeProgress(): Flow<UserProgressEntity?>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun initializeProgress(progress: UserProgressEntity): Long
 
@@ -58,6 +65,9 @@ interface UnlockSessionDao {
 
     @Query("UPDATE user_progress SET balance = balance + :points WHERE id = 1")
     suspend fun addPoints(points: Int): Int
+
+    @Query("UPDATE user_progress SET balance = balance + :points, xp = xp + :xp WHERE id = 1")
+    suspend fun addReward(points: Int, xp: Int): Int
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertTransaction(transaction: PointTransactionEntity)
@@ -98,4 +108,7 @@ interface UnlockSessionDao {
 
     @Query("SELECT COUNT(*) FROM point_transactions WHERE type = 'APP_UNLOCK'")
     suspend fun unlockTransactionCount(): Int
+
+    @Query("SELECT COUNT(*) FROM point_transactions WHERE type = :type")
+    suspend fun transactionCount(type: com.mushind.mind.domain.model.PointTransactionType): Int
 }

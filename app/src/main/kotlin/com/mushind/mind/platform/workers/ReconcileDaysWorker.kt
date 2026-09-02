@@ -13,6 +13,7 @@ import com.mushind.mind.domain.usecase.ReconcileDays
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CancellationException
 
 @HiltWorker
 class ReconcileDaysWorker @AssistedInject constructor(
@@ -20,13 +21,26 @@ class ReconcileDaysWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val reconcileDays: ReconcileDays,
 ) : CoroutineWorker(context, params) {
-    override suspend fun doWork(): Result = runCatching {
+    override suspend fun doWork(): Result = try {
         reconcileDays()
-    }.fold(
-        onSuccess = { Result.success() },
-        onFailure = { Result.retry() },
-    )
+        Result.success()
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (_: Exception) {
+        Result.retry()
+    }
 }
+
+internal const val RECONCILE_STARTUP_TAG = "daily-cycle-startup"
+internal const val RECONCILE_PERIODIC_TAG = "daily-cycle-periodic"
+
+internal fun startupReconcileRequest() = OneTimeWorkRequestBuilder<ReconcileDaysWorker>()
+    .addTag(RECONCILE_STARTUP_TAG)
+    .build()
+
+internal fun periodicReconcileRequest() = PeriodicWorkRequestBuilder<ReconcileDaysWorker>(12, TimeUnit.HOURS)
+    .addTag(RECONCILE_PERIODIC_TAG)
+    .build()
 
 object DailyCycleWorkScheduler {
     private const val STARTUP_WORK = "daily-cycle-startup"
@@ -37,12 +51,12 @@ object DailyCycleWorkScheduler {
         workManager.enqueueUniqueWork(
             STARTUP_WORK,
             ExistingWorkPolicy.KEEP,
-            OneTimeWorkRequestBuilder<ReconcileDaysWorker>().build(),
+            startupReconcileRequest(),
         )
         workManager.enqueueUniquePeriodicWork(
             PERIODIC_WORK,
             ExistingPeriodicWorkPolicy.UPDATE,
-            PeriodicWorkRequestBuilder<ReconcileDaysWorker>(12, TimeUnit.HOURS).build(),
+            periodicReconcileRequest(),
         )
     }
 }

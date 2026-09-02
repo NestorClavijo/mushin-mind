@@ -37,6 +37,7 @@ import com.mushind.mind.core.design.component.ScreenHeader
 import com.mushind.mind.core.design.component.PermissionBanner
 import com.mushind.mind.domain.model.AccentPalette
 import com.mushind.mind.domain.model.ThemeMode
+import com.mushind.mind.domain.model.AppearanceSettings
 
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
@@ -99,15 +100,10 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
             )
         }
         SettingsSection(stringResource(R.string.appearance)) {
-            SettingsRow(
-                title = stringResource(R.string.theme),
-                value = appearance.themeMode.displayName(),
-                onClick = viewModel::cycleThemeMode,
-            )
-            SettingsRow(
-                title = "Acento",
-                value = appearance.accentPalette.displayName(),
-                onClick = viewModel::cycleAccentPalette,
+            AppearanceSettingsRows(
+                appearance = appearance,
+                onThemeClick = viewModel::cycleThemeMode,
+                onAccentClick = viewModel::cycleAccentPalette,
             )
         }
         SettingsSection("Emergencia") {
@@ -132,6 +128,24 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
             }
         }
     }
+}
+
+@Composable
+internal fun AppearanceSettingsRows(
+    appearance: AppearanceSettings,
+    onThemeClick: () -> Unit,
+    onAccentClick: () -> Unit,
+) {
+    SettingsRow(
+        title = stringResource(R.string.theme),
+        value = appearance.themeMode.displayName(),
+        onClick = onThemeClick,
+    )
+    SettingsRow(
+        title = "Acento",
+        value = appearance.accentPalette.displayName(),
+        onClick = onAccentClick,
+    )
 }
 
 private fun ThemeMode.displayName() = when (this) {

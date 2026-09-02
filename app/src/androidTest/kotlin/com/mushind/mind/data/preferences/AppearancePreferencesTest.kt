@@ -30,4 +30,20 @@ class AppearancePreferencesTest {
         preferences.setThemeMode(ThemeMode.SYSTEM)
         preferences.setAccentPalette(AccentPalette.SAGE)
     }
+
+    @Test
+    fun reminderEnabledAndTimeSurviveSubsequentReads() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val preferences = ReminderPreferences(context)
+
+        try {
+            preferences.setTime(7, 45)
+            preferences.setEnabled(true)
+
+            assertEquals(ReminderSettings(enabled = true, hour = 7, minute = 45), preferences.settings.first())
+        } finally {
+            preferences.setEnabled(false)
+            preferences.setTime(21, 30)
+        }
+    }
 }

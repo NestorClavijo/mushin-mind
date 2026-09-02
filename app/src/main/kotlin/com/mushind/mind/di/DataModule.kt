@@ -21,6 +21,7 @@ import com.mushind.mind.data.repository.RoomUnlockSessionRepository
 import com.mushind.mind.data.repository.RoomProtectedRuleChangeRepository
 import com.mushind.mind.data.repository.RoomEmergencyUnlockRepository
 import com.mushind.mind.data.repository.RoomStatisticsRepository
+import com.mushind.mind.data.repository.RoomTaskRepository
 import com.mushind.mind.data.preferences.EmergencyPreferences
 import com.mushind.mind.data.preferences.AppearancePreferences
 import com.mushind.mind.domain.model.LogicalDayResolver
@@ -34,6 +35,7 @@ import com.mushind.mind.domain.repository.EmergencyPolicyRepository
 import com.mushind.mind.domain.repository.EmergencyUnlockRepository
 import com.mushind.mind.domain.repository.StatisticsRepository
 import com.mushind.mind.domain.repository.AppearanceRepository
+import com.mushind.mind.domain.repository.TaskRepository
 import com.mushind.mind.domain.usecase.ChallengePolicy
 import com.mushind.mind.BuildConfig
 import java.time.Duration
@@ -93,6 +95,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAppearanceRepository(implementation: AppearancePreferences): AppearanceRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTaskRepository(implementation: RoomTaskRepository): TaskRepository
 }
 
 @Module

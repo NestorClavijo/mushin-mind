@@ -178,7 +178,7 @@ private fun AppRow(app: InstalledApplication, onClick: () -> Unit) {
 }
 
 @Composable
-private fun AppRuleEditor(
+internal fun AppRuleEditor(
     app: InstalledApplication,
     pendingChange: com.mushind.mind.domain.model.PendingRuleChange?,
     onBack: () -> Unit,
@@ -310,7 +310,7 @@ private fun ProtectedChangeReview(
 }
 
 @Composable
-private fun ChallengeDialog(
+internal fun ChallengeDialog(
     state: ProtectedChangeUiState.InProgress,
     onAnswer: (Int) -> Unit,
     onAbandon: () -> Unit,

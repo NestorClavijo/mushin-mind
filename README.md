@@ -36,8 +36,13 @@ Desarrollo inicial:
 - desglose semanal por aplicación e historiales recientes de actividad.
 - sistema visual con tokens reutilizables de color, tipografía, espaciado, formas y elevación;
 - temas claro, oscuro o del sistema con cuatro acentos persistentes y configurables.
+- creación y finalización de tareas conectadas de extremo a extremo con saldo y XP persistentes;
+- transacción Room atómica para acreditar cada tarea una sola vez y revertir fallos del ledger;
+- cobertura de integración para Room, DataStore y solicitudes de WorkManager;
+- pruebas de UI para tareas, reglas, apariencia y retos, más un checklist de release reproducible.
 
 La especificación funcional se encuentra en [REQUIREMENTS.md](REQUIREMENTS.md) y el orden de implementación en [PLAN.md](PLAN.md).
+La validación manual previa a una release se encuentra en [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md).
 
 ## Requisitos de desarrollo
 
@@ -46,3 +51,13 @@ La especificación funcional se encuentra en [REQUIREMENTS.md](REQUIREMENTS.md) 
 - Android SDK 37.
 
 El proyecto es offline-first y no requiere backend ni credenciales.
+
+## Verificación
+
+```powershell
+.\gradlew.bat testDebugUnitTest compileDebugAndroidTestSources
+.\gradlew.bat assembleDebug assembleRelease
+.\gradlew.bat lintDebug
+```
+
+Las pruebas instrumentadas se ejecutan con `connectedDebugAndroidTest` cuando hay un dispositivo o emulador conectado.

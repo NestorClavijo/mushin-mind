@@ -13,6 +13,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.mushind.mind.R
@@ -52,15 +53,13 @@ class PlanningReminderWorker @AssistedInject constructor(
     }
 
     private fun createChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                applicationContext.getString(R.string.planning_reminder_channel),
-                NotificationManager.IMPORTANCE_DEFAULT,
-            )
-            applicationContext.getSystemService(NotificationManager::class.java)
-                .createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            applicationContext.getString(R.string.planning_reminder_channel),
+            NotificationManager.IMPORTANCE_DEFAULT,
+        )
+        applicationContext.getSystemService(NotificationManager::class.java)
+            .createNotificationChannel(channel)
     }
 
     private companion object {
@@ -81,17 +80,24 @@ class PlanningReminderScheduler @Inject constructor(
             return
         }
 
-        val now = ZonedDateTime.ofInstant(clock.now(), clock.zoneId())
-        var next = now.toLocalDate().atTime(settings.hour, settings.minute).atZone(clock.zoneId())
-        if (!next.isAfter(now)) next = next.plusDays(1)
-        val delay = Duration.between(now, next)
-        val request = PeriodicWorkRequestBuilder<PlanningReminderWorker>(24, TimeUnit.HOURS)
-            .setInitialDelay(delay)
-            .build()
+        val request = planningReminderRequest(settings, clock)
         workManager.enqueueUniquePeriodicWork(WORK_NAME, ExistingPeriodicWorkPolicy.UPDATE, request)
     }
 
     private companion object {
         const val WORK_NAME = "planning-reminder"
     }
+}
+
+internal fun planningReminderRequest(
+    settings: ReminderSettings,
+    clock: ClockProvider,
+): PeriodicWorkRequest {
+    require(settings.enabled)
+    val now = ZonedDateTime.ofInstant(clock.now(), clock.zoneId())
+    var next = now.toLocalDate().atTime(settings.hour, settings.minute).atZone(clock.zoneId())
+    if (!next.isAfter(now)) next = next.plusDays(1)
+    return PeriodicWorkRequestBuilder<PlanningReminderWorker>(24, TimeUnit.HOURS)
+        .setInitialDelay(Duration.between(now, next))
+        .build()
 }
