@@ -25,7 +25,6 @@
     <string name="statistics_empty_explanation">Completa tareas y utiliza puntos para empezar a construir tu historial.</string>
     <string name="settings_title">Configuración</string>
     <string name="protection">Protección</string>
-    <string name="protection_disabled">Desactivada</string>
     <string name="protection_enabled">Activa</string>
     <string name="protection_service_name">Protección de aplicaciones Mind</string>
     <string name="accessibility_service_description">Detecta cuándo se abre una aplicación restringida y muestra una pantalla de pausa. No lee ni almacena el contenido de la pantalla.</string>
@@ -37,7 +36,6 @@
     <string name="planning_reminder_body">Define tus tareas antes de que empiece el día.</string>
     <string name="appearance">Apariencia</string>
     <string name="theme">Tema</string>
-    <string name="system_theme">Sistema</string>
     <string name="emergency_hold_button">Mantener pulsado 3 segundos</string>
     <string name="emergency_hold_progress">Sigue pulsando…</string>
 </resources>

@@ -7,7 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.mushind.mind.core.design.appSpacing
 
 @Composable
 fun ScreenHeader(
@@ -18,7 +18,10 @@ fun ScreenHeader(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 20.dp),
+            .padding(
+                horizontal = MaterialTheme.appSpacing.xLarge,
+                vertical = MaterialTheme.appSpacing.xLarge,
+            ),
     ) {
         Text(text = title, style = MaterialTheme.typography.headlineMedium)
         if (supportingText != null) {
@@ -26,9 +29,8 @@ fun ScreenHeader(
                 text = supportingText,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 4.dp),
+                modifier = Modifier.padding(top = MaterialTheme.appSpacing.xSmall),
             )
         }
     }
 }
-

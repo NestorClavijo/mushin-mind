@@ -4,7 +4,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-val MindTypography = Typography().run {
+val AppTypography = Typography().run {
     copy(
         displaySmall = displaySmall.copy(fontWeight = FontWeight.SemiBold, fontSize = 44.sp),
         headlineMedium = headlineMedium.copy(fontWeight = FontWeight.SemiBold),
@@ -13,3 +13,4 @@ val MindTypography = Typography().run {
     )
 }
 
+val MindTypography = AppTypography

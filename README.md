@@ -34,6 +34,8 @@ Desarrollo inicial:
 - configuración local de duración y penalización de emergencia.
 - resumen diario y semanal calculado desde tareas, transacciones, sesiones y emergencias;
 - desglose semanal por aplicación e historiales recientes de actividad.
+- sistema visual con tokens reutilizables de color, tipografía, espaciado, formas y elevación;
+- temas claro, oscuro o del sistema con cuatro acentos persistentes y configurables.
 
 La especificación funcional se encuentra en [REQUIREMENTS.md](REQUIREMENTS.md) y el orden de implementación en [PLAN.md](PLAN.md).
 

@@ -14,7 +14,7 @@ import com.mushind.mind.domain.model.EmergencyPenaltyMode
 import com.mushind.mind.domain.model.EmergencyPolicy
 import com.mushind.mind.domain.repository.EmergencyPolicyRepository
 
-private val Context.settingsDataStore by preferencesDataStore(name = "settings")
+internal val Context.settingsDataStore by preferencesDataStore(name = "settings")
 
 data class ReminderSettings(
     val enabled: Boolean = false,

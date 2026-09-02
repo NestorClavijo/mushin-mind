@@ -10,12 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +25,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mushind.mind.R
 import com.mushind.mind.core.design.component.EmptyState
+import com.mushind.mind.core.design.component.PrimaryButton
+import com.mushind.mind.core.design.component.SecondaryButton
 import com.mushind.mind.domain.model.DailyPlan
 import com.mushind.mind.domain.model.DailyPlanStatus
 
@@ -85,9 +85,11 @@ private fun DailyPlanContent(
 
     val tomorrowPlan = state.tomorrowPlan
     if (tomorrowPlan == null) {
-        Button(onClick = onPrepareTomorrow, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.plan_tomorrow))
-        }
+        PrimaryButton(
+            label = stringResource(R.string.plan_tomorrow),
+            onClick = onPrepareTomorrow,
+            modifier = Modifier.fillMaxWidth(),
+        )
     } else {
         TomorrowPlanCard(tomorrowPlan, onConfirmTomorrow)
     }
@@ -110,9 +112,11 @@ private fun TomorrowPlanCard(plan: DailyPlan, onConfirm: () -> Unit) {
             )
             PlanStatusLabel(plan.status)
             if (plan.status == DailyPlanStatus.DRAFT) {
-                OutlinedButton(onClick = onConfirm, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.confirm_plan))
-                }
+                SecondaryButton(
+                    label = stringResource(R.string.confirm_plan),
+                    onClick = onConfirm,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             } else if (plan.status == DailyPlanStatus.CONFIRMED) {
                 Text(stringResource(R.string.plan_ready), color = MaterialTheme.colorScheme.primary)
             }

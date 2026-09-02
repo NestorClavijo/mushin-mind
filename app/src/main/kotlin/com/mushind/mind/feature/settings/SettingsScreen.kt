@@ -34,6 +34,9 @@ import androidx.lifecycle.Lifecycle
 import com.mushind.mind.R
 import com.mushind.mind.BuildConfig
 import com.mushind.mind.core.design.component.ScreenHeader
+import com.mushind.mind.core.design.component.PermissionBanner
+import com.mushind.mind.domain.model.AccentPalette
+import com.mushind.mind.domain.model.ThemeMode
 
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
@@ -41,6 +44,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
     val isProtectionEnabled by viewModel.isProtectionEnabled.collectAsStateWithLifecycle()
     val debugBalance by viewModel.debugBalance.collectAsStateWithLifecycle()
     val emergencyPolicy by viewModel.emergencyPolicy.collectAsStateWithLifecycle()
+    val appearance by viewModel.appearance.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -58,15 +62,21 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
     ) {
         ScreenHeader(title = stringResource(R.string.settings_title))
         SettingsSection(stringResource(R.string.protection)) {
-            SettingsRow(
-                title = stringResource(R.string.protection),
-                value = stringResource(
-                    if (isProtectionEnabled) R.string.protection_enabled else R.string.protection_disabled,
-                ),
-                onClick = {
-                    context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-                },
-            )
+            if (isProtectionEnabled) {
+                SettingsRow(
+                    title = stringResource(R.string.protection),
+                    value = stringResource(R.string.protection_enabled),
+                    onClick = { context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) },
+                )
+            } else {
+                PermissionBanner(
+                    title = "Protección desactivada",
+                    description = "Activa el servicio de accesibilidad para aplicar las reglas de acceso.",
+                    actionLabel = "Revisar permiso",
+                    onAction = { context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) },
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                )
+            }
         }
         SettingsSection(stringResource(R.string.routine)) {
             SettingsSwitchRow(
@@ -91,7 +101,13 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
         SettingsSection(stringResource(R.string.appearance)) {
             SettingsRow(
                 title = stringResource(R.string.theme),
-                value = stringResource(R.string.system_theme),
+                value = appearance.themeMode.displayName(),
+                onClick = viewModel::cycleThemeMode,
+            )
+            SettingsRow(
+                title = "Acento",
+                value = appearance.accentPalette.displayName(),
+                onClick = viewModel::cycleAccentPalette,
             )
         }
         SettingsSection("Emergencia") {
@@ -116,6 +132,19 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
             }
         }
     }
+}
+
+private fun ThemeMode.displayName() = when (this) {
+    ThemeMode.SYSTEM -> "Seguir sistema"
+    ThemeMode.LIGHT -> "Claro"
+    ThemeMode.DARK -> "Oscuro"
+}
+
+private fun AccentPalette.displayName() = when (this) {
+    AccentPalette.SAGE -> "Salvia"
+    AccentPalette.OCEAN -> "Océano"
+    AccentPalette.AMBER -> "Ámbar"
+    AccentPalette.PLUM -> "Ciruela"
 }
 
 @Composable

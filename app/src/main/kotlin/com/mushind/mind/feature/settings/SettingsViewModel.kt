@@ -9,6 +9,10 @@ import com.mushind.mind.platform.accessibility.ProtectionStatusMonitor
 import com.mushind.mind.platform.debug.DebugPointSeeder
 import com.mushind.mind.domain.repository.EmergencyPolicyRepository
 import com.mushind.mind.domain.model.EmergencyPolicy
+import com.mushind.mind.domain.model.AccentPalette
+import com.mushind.mind.domain.model.AppearanceSettings
+import com.mushind.mind.domain.model.ThemeMode
+import com.mushind.mind.domain.repository.AppearanceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,6 +28,7 @@ class SettingsViewModel @Inject constructor(
     private val protectionStatusMonitor: ProtectionStatusMonitor,
     private val debugPointSeeder: DebugPointSeeder,
     private val emergencyPolicies: EmergencyPolicyRepository,
+    private val appearanceRepository: AppearanceRepository,
 ) : ViewModel() {
     private val _isProtectionEnabled = MutableStateFlow(false)
     val isProtectionEnabled = _isProtectionEnabled.asStateFlow()
@@ -39,6 +44,11 @@ class SettingsViewModel @Inject constructor(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = EmergencyPolicy(),
+    )
+    val appearance = appearanceRepository.settings.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = AppearanceSettings(),
     )
 
     fun setPlanningReminderEnabled(enabled: Boolean) {
@@ -68,5 +78,17 @@ class SettingsViewModel @Inject constructor(
         val current = emergencyPolicy.value.fixedPenaltyPoints
         val next = options[(options.indexOf(current).takeIf { it >= 0 } ?: 0).plus(1) % options.size]
         viewModelScope.launch { emergencyPolicies.setFixedPenalty(next) }
+    }
+
+    fun cycleThemeMode() {
+        val entries = ThemeMode.entries
+        val next = entries[(entries.indexOf(appearance.value.themeMode) + 1) % entries.size]
+        viewModelScope.launch { appearanceRepository.setThemeMode(next) }
+    }
+
+    fun cycleAccentPalette() {
+        val entries = AccentPalette.entries
+        val next = entries[(entries.indexOf(appearance.value.accentPalette) + 1) % entries.size]
+        viewModelScope.launch { appearanceRepository.setAccentPalette(next) }
     }
 }

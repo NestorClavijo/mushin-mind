@@ -57,6 +57,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mushind.mind.core.design.component.EmptyState
 import com.mushind.mind.core.design.component.ScreenHeader
+import com.mushind.mind.core.design.component.AppRuleCard
+import com.mushind.mind.core.design.component.PrimaryButton
 import com.mushind.mind.domain.model.AppRuleType
 import com.mushind.mind.domain.model.InstalledApplication
 import com.mushind.mind.domain.model.AppRule
@@ -275,13 +277,13 @@ private fun AppRuleEditor(
                 )
             }
         }
+        item { AppRuleCard("Resumen de la regla", ruleSummary(type, cost, duration)) }
         item {
-            Card { Text(ruleSummary(type, cost, duration), Modifier.padding(16.dp)) }
-        }
-        item {
-            Button(onClick = { onSave(type, cost, duration) }, modifier = Modifier.fillMaxWidth()) {
-                Text(if (current == null) "Activar y guardar" else "Guardar cambios")
-            }
+            PrimaryButton(
+                label = if (current == null) "Activar y guardar" else "Guardar cambios",
+                onClick = { onSave(type, cost, duration) },
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }
